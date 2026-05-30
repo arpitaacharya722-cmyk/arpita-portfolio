@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Arpita Acharya — Personal Portfolio
 
 A fully interactive personal portfolio website built with React, Vite, Tailwind CSS, and Framer Motion.
@@ -234,3 +235,6 @@ This project is personal and not licensed for redistribution. Feel free to use i
 ---
 
 *Built with React + Vite*
+=======
+# arpita-portfolio
+>>>>>>> 2bd22f4e573c031eea994a37125fe67be4dfb1bb
