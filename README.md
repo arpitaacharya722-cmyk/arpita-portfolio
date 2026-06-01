@@ -65,6 +65,32 @@ Make sure you have **Node.js 18+** and **npm** installed.
 Check: `node --version` and `npm --version` in your terminal.
 
 ---
+## Making your profile image public
+
+If you want your profile image to be visible to everyone who visits your deployed site, add a file named `profile.jpg` to the project's `public/` folder and push it to GitHub. The site will serve that image at the root (`/profile.jpg`).
+
+Quick options:
+
+- Manually: copy your chosen image into `artifacts/portfolio/public/profile.jpg`, then run:
+
+```powershell
+cd artifacts/portfolio
+git add public/profile.jpg
+git commit -m "Add public profile image"
+git push
+```
+
+- Helper script: from the project root run:
+
+```powershell
+node scripts/save-profile.js C:\path\to\your\image.jpg
+git add public/profile.jpg
+git commit -m "Add public profile image"
+git push
+```
+
+After pushing, the site will show `/profile.jpg` to all visitors.
+
 
 ### Step 1 — Get the code
 
