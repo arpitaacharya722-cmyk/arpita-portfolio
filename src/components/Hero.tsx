@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, Download, Linkedin, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,83 +67,12 @@ export default function Hero() {
 }
 
 function ProfileBlock() {
-  const [image, setImage] = useState<string | null>(null);
-  const inputRef = useRef<HTMLInputElement | null>(null);
-
-  useEffect(() => {
-    try {
-      // Prefer a committed public `profile.jpg` (deployed) so everyone sees it.
-      const publicUrl = `${import.meta.env.BASE_URL || "/"}profile.jpg`;
-      fetch(publicUrl, { method: "HEAD" })
-        .then((res) => {
-          if (res.ok) {
-            setImage(publicUrl);
-          } else {
-            const stored = localStorage.getItem("profileImage");
-            if (stored) setImage(stored);
-          }
-        })
-        .catch(() => {
-          const stored = localStorage.getItem("profileImage");
-          if (stored) setImage(stored);
-        });
-    } catch (e) {
-      // ignore
-    }
-  }, [])
-
-  // Listen for localStorage changes from other tabs/windows and update image
-  useEffect(() => {
-    const onStorage = (e: StorageEvent) => {
-      if (e.key === "profileImage") {
-        if (e.newValue) {
-          setImage(e.newValue);
-        } else {
-          // profileImage was removed in another tab — fallback to public or null
-          const publicUrl = `${import.meta.env.BASE_URL || "/"}profile.jpg`;
-          fetch(publicUrl, { method: "HEAD" })
-            .then((res) => {
-              if (res.ok) setImage(publicUrl);
-              else setImage(null);
-            })
-            .catch(() => setImage(null));
-        }
-      }
-    };
-
-    window.addEventListener("storage", onStorage);
-    return () => window.removeEventListener("storage", onStorage);
-  }, []);
-
-  const onFile = (file?: File) => {
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = () => {
-      const result = reader.result as string
-      setImage(result)
-      try { localStorage.setItem("profileImage", result) } catch (e) {}
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const handleChangeClick = () => {
-    inputRef.current?.click()
-  }
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const f = e.target.files?.[0]
-    if (f) onFile(f)
-    e.currentTarget.value = ""
-  }
-
-  const handleDelete = () => {
-    setImage(null)
-    try { localStorage.removeItem("profileImage") } catch (e) {}
-  }
+  const [showFallback, setShowFallback] = useState(false);
+  const publicUrl = `${import.meta.env.BASE_URL || "/"}profile.jpg`;
 
   const placeholder = (
     <div className="text-6xl font-mono text-muted-foreground/30 font-bold select-none">&lt;/&gt;</div>
-  )
+  );
 
   return (
     <div className="w-72 h-72 md:w-96 md:h-96 relative flex flex-col items-center">
@@ -151,19 +80,18 @@ function ProfileBlock() {
         <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-[spin_10s_linear_infinite]" />
         <div className="absolute inset-4 border-2 border-dashed border-primary/40 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
         <div className="absolute inset-8 bg-secondary rounded-full flex items-center justify-center overflow-hidden border border-border shadow-2xl">
-          {image ? (
-            <img src={image} alt="Profile" className="w-full h-full object-cover" />
+          {!showFallback ? (
+            <img
+              src={publicUrl}
+              alt="Profile"
+              className="w-full h-full object-cover"
+              onError={() => setShowFallback(true)}
+            />
           ) : (
             placeholder
           )}
         </div>
       </div>
-
-      <div className="mt-4 flex items-center gap-3">
-        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-        <button type="button" onClick={handleChangeClick} className="px-4 py-2 bg-primary text-primary-foreground rounded-md text-sm font-medium">Change</button>
-        <button type="button" onClick={handleDelete} className="px-4 py-2 bg-muted text-foreground rounded-md text-sm font-medium border border-border">Delete</button>
-      </div>
     </div>
-  )
+  );
 }
